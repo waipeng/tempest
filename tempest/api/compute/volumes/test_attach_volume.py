@@ -57,7 +57,8 @@ class AttachVolumeTestJSON(base.BaseV2ComputeTest):
     def _detach(self, server_id, volume_id):
         if self.attachment:
             self.servers_client.detach_volume(server_id, volume_id)
-            waiters.wait_for_volume_status(self.volumes_client, volume_id, 'available')
+            waiters.wait_for_volume_status(self.volumes_client, volume_id,
+                                           'available')
 
     def _delete_volume(self):
         # Delete the created Volumes
@@ -83,14 +84,15 @@ class AttachVolumeTestJSON(base.BaseV2ComputeTest):
             size=CONF.volume.volume_size, display_name='test')['volume']
         self.addCleanup(self._delete_volume)
         waiters.wait_for_volume_status(self.volumes_client, self.volume['id'],
-                                                   'available')
+                                       'available')
 
         # Attach the volume to the server
         self.attachment = self.servers_client.attach_volume(
             self.server['id'],
             volumeId=self.volume['id'],
             device='/dev/%s' % self.device)['volumeAttachment']
-        waiters.wait_for_volume_status(self.volumes_client, self.volume['id'], 'in-use')
+        waiters.wait_for_volume_status(self.volumes_client, self.volume['id'],
+                                       'in-use')
 
         self.addCleanup(self._detach, self.server['id'], self.volume['id'])
 
